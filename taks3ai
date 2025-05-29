@@ -1,0 +1,54 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Load dataset
+df = pd.read_csv('house_prices.csv')  # replace with your file path
+
+# ---------- Simple Linear Regression ----------
+X_simple = df[['GrLivArea']].dropna()
+y_simple = df.loc[X_simple.index, 'SalePrice']
+
+X_train, X_test, y_train, y_test = train_test_split(X_simple, y_simple, test_size=0.2, random_state=42)
+
+model_simple = LinearRegression()
+model_simple.fit(X_train, y_train)
+y_pred_simple = model_simple.predict(X_test)
+
+print("\nSimple Linear Regression:")
+print("R^2 Score:", r2_score(y_test, y_pred_simple))
+print("MSE:", mean_squared_error(y_test, y_pred_simple))
+
+# Plot
+plt.scatter(X_test, y_test, color='blue', label='Actual')
+plt.plot(X_test, y_pred_simple, color='red', label='Predicted')
+plt.xlabel('GrLivArea')
+plt.ylabel('SalePrice')
+plt.title('Simple Linear Regression')
+plt.legend()
+plt.show()
+
+# ---------- Multiple Linear Regression ----------
+features = ['GrLivArea', 'GarageCars', 'OverallQual', 'TotalBsmtSF']
+df_multi = df[features + ['SalePrice']].dropna()
+
+X = df_multi[features]
+y = df_multi['SalePrice']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model_multi = LinearRegression()
+model_multi.fit(X_train, y_train)
+y_pred_multi = model_multi.predict(X_test)
+
+print("\nMultiple Linear Regression:")
+print("R^2 Score:", r2_score(y_test, y_pred_multi))
+print("MSE:", mean_squared_error(y_test, y_pred_multi))
+
+# Coefficients
+print("\nModel Coefficients:")
+print("Intercept:", model_multi.intercept_)
+for feat, coef in zip(features, model_multi.coef_):
+    print(f"{feat}: {coef}")
